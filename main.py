@@ -1,4 +1,4 @@
-import sys, re
+import sys, re, json, os
 
 def top10tweets(tweets: list):
     top = []
@@ -45,4 +45,45 @@ def top10hashtags(tweets: list):
     return top[:10]
 
 def main():
-    pass
+    if len(sys.argv) != 2 or not os.path.exists(sys.argv[1]):
+        print("Invalid command or filename. Correct usage:")
+        print("python main.py FILENAME.json")
+        sys.exit(1)
+    tweets = json.load(sys.argv[1])
+    while True:
+        print("1. Show 10 tweets with most RTs")
+        print("2. Show 10 users with most tweets")
+        print("3. Show 10 days with most tweets")
+        print("4. Show 10 most used hashtags")
+        print("5. Quit")
+        opt = input().strip()
+        if not opt.isdigit():
+            print("Invalid input")
+            continue
+        opt_n = int(opt)
+        if not (1 <= opt_n <= 5):
+            print("Invalid input")
+            continue
+        if opt_n == 1:
+            top10 = top10tweets(tweets)
+            for tweet in top10:
+                print("url:", tweet["url"])
+                print(tweet["content"])
+                print(tweet["retweetCount"], "retweets")
+        elif opt_n == 2:
+            top10 = top10users(tweets)
+            for user, tweet_n in top10:
+                print(f"user: {user}, {tweet_n} tweets")
+        elif opt_n == 3:
+            top10 = top10days(tweets)
+            for date, tweet_n in top10:
+                print(f"On {date} there were {tweet_n} tweets")
+        elif opt_n == 4:
+            top10 = top10hashtags(tweets)
+            for hashtag, tweet_n in top10:
+                print(f"hashtag #{hashtag} appeared on {tweet_n} tweets")
+        elif opt_n == 5:
+            break
+
+if __name__ == "__main__":
+    main()
